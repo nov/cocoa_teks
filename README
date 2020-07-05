@@ -1,0 +1,11 @@
+# Setup
+
+```sh
+bundle install
+```
+
+# Execute
+
+```sh
+ruby download.rb
+```

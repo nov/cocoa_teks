@@ -10,7 +10,9 @@ Dir.glob('data/*/*').each do |file_name|
 end
 
 # Download TEK files.
-list = JSON.parse(File.read('data/list.json'))
+list = open('https://covid19radar-jpn-prod.azureedge.net/c19r/440/list.json') do |f|
+  JSON.parse(f.read)
+end
 list.each do |file|
   url = file['url']
 
@@ -44,7 +46,15 @@ end
 files = Dir.glob('data/bin/*.bin')
 keys = files.collect do |file|
   teks = TemporaryExposureKeyExport.decode File.read(file)
-  teks.keys.collect(&:key_data).collect { |b64| Base64.encode64 b64 }
-end
+  teks.keys.collect(&:key_data).collect do |b64|
+    Base64.encode64 b64
+  end
+end.flatten.collect(&:chop)
 
-puts keys, keys.size
+puts <<-OUTPUT
+# Keys
+#{keys.join("\n")}
+
+# Num of Keys
+#{keys.size}
+OUTPUT
