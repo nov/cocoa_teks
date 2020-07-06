@@ -43,8 +43,10 @@ list.each do |file|
 end
 
 # Decode TEK files
-files = Dir.glob('data/bin/*.bin')
-keys = files.collect do |file|
+sources = list.collect do |file|
+  "#{Time.at(file['created']).strftime('%Y/%m/%d %H:%M')} : #{file['url']}"
+end
+keys = Dir.glob('data/bin/*.bin').collect do |file|
   teks = TemporaryExposureKeyExport.decode File.read(file)
   teks.keys.collect(&:key_data).collect do |b64|
     Base64.encode64 b64
@@ -52,6 +54,9 @@ keys = files.collect do |file|
 end.flatten.collect(&:chop)
 
 puts <<-OUTPUT
+# Sources
+#{sources.join("\n")}
+
 # Keys
 #{keys.join("\n")}
 
